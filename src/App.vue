@@ -7,7 +7,11 @@
   </p>
 
   <div id="cards">
-    <WordCard v-for="(word ,) in ShuffledWords"  v-bind:word="word" @incrementCorrectCount="incrementCorrectCount();" @incrementInCorrectCount="incrementIncorrectCount();"></WordCard>
+    <WordCard 
+        v-for="(word ) in ShuffledWords"
+        v-bind:word="word" @incrementCorrectCount="incrementCorrectCount();"
+       @incrementInCorrectCount="incrementIncorrectCount();">
+    </WordCard>
 
   </div>
 
@@ -16,15 +20,18 @@
     <button @click="resetWrongAnswer()">reset wrong answer</button>
   </div>
 
-
+<PlusWord @add-word="addWordToEnglishWords"  ></PlusWord>
+  
 </template>
 
 
 
 <script>
+import PlusWord from './components/PlusWord.vue';
 import WordCard from './components/WordCard.vue'
 export default {
-  components:{WordCard,},
+  components:{WordCard,PlusWord},
+
   data() {
     return {
       EnglishWords: [
@@ -43,15 +50,16 @@ export default {
           correct: false
         },
         
-
+        
       ],
       correctCount: null,
       incorrectCount: null,
-      completed: false,
-      ShuffledWords: null,
+      completed: false
+      
     };
+    
   },
-
+  
   computed: {
     ShuffledWords() {
       return this.EnglishWords.sort(() => .5 - Math.random());
@@ -60,67 +68,71 @@ export default {
       return this.EnglishWords.length;
     }
   },
-
+  
   // this methods watching correctCount in methoud checkanswer order to if it equal versus the WordCount say alert congrats
   watch: {
     // correctCount() {
     //     if (this.correctCount == this.WordCount) {
-    //         alert('congrats');
-    //     }
-    // },
-
-    // Watcher for correctCount.
-    // If correctCount equals WordCount, sets completed flag to true.
-    correctCount() {
-      this.completed = this.correctCount == this.WordCount;
+      //         alert('congrats');
+      //     }
+      // },
+      
+      // Watcher for correctCount.
+      // If correctCount equals WordCount, sets completed flag to true.
+      correctCount() {
+        this.completed = this.correctCount == this.WordCount;
+      },
+      incorrectCount() {
+        if (this.incorrectCount >= 10) {
+          this.resetBtn();
+          alert('please be more careful and strive to answer correctly')
+        }
+        this.EnglishWords.forEach((word) => {
+          if (this.incorrectCount >= 2) {
+            word.Answer = '';
+          }
+        });
+      },
     },
-    incorrectCount() {
-      if (this.incorrectCount >= 10) {
-        this.resetBtn();
-        alert('please be more careful and strive to answer correctly')
+
+
+
+      methods: {
+        addWordToEnglishWords(newWord) {
+          this.EnglishWords.push(newWord)
+        },
+
+        incrementCorrectCount(){
+          this.correctCount++;
+        },
+        
+        incrementIncorrectCount(){
+          this.incorrectCount++;
+        },
+        
+        resetBtn() {
+          if (this.ShuffledWords) {
+            this.ShuffledWords.forEach((word) => {
+              word.Answer = '';
+              word.correct = false;
+              word.incorrect = false;
+            });
+          }
+          this.completed = false;
+          this.correctCount = null;
+          this.incorrectCount = null;
+        },
+        resetWrongAnswer() {
+          this.ShuffledWords.forEach((word) => {
+            if (word.incorrect) {
+              word.Answer = '';
+              word.incorrect = false;
+            }
+          });
+        },
+        
       }
-      this.EnglishWords.forEach((word) => {
-        if (this.incorrectCount >= 2) {
-          word.Answer = '';
-        }
-      });
-    },
-  },
-  // mounted() { 
-  //   this.ShuffledWords=this.EnglishWords.sort(() => .5 - Math.random());
-  //  },
-  methods: {
-    incrementCorrectCount(){
-      this.correctCount++;
-    },
-
-    incrementIncorrectCount(){
-      this.incorrectCount++;
-    },
-
-    resetBtn() {
-  if (this.ShuffledWords) {
-    this.ShuffledWords.forEach((word) => {
-      word.Answer = '';
-      word.correct = false;
-      word.incorrect = false;
-    });
-  }
-  this.completed = false;
-  this.correctCount = null;
-  this.incorrectCount = null;
-},
-    resetWrongAnswer() {
-      this.ShuffledWords.forEach((word) => {
-        if (word.incorrect) {
-          word.Answer = '';
-          word.incorrect = false;
-        }
-      });
-    },
-
-}
-};
+    };
 </script>
 
 
@@ -207,4 +219,5 @@ input[type=text] {
   padding: 10px;
   margin: 10px;
 }
+
 </style>

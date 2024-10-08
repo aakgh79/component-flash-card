@@ -5,19 +5,18 @@
       <p v-else class="correct.word_B">{{ word.word_B }}</p>
       <p v-if="word.incorrect >= 3">{{ word.Hint }}</p>
     </div>
+    <!-- <div v-for="(word, index) in words" :key="index"></div> -->
 </template>
 <script>
 export default {
     name: 'WordCard',
-    props: ['word'],
+    props: {word: Array},
     data() {
         return {
 
         }
     },
-    mounted() {
 
-    },
     methods: {
 
         reset() {
@@ -35,7 +34,11 @@ export default {
             } else {
                 this.$emit('incrementInCorrectCount');
             }
+            console.log(this.word.correct);
+            debugger;
+            console.log(this.word.incorrect);
         },
+        
     }
 };
 </script>
